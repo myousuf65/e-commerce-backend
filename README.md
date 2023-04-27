@@ -19,23 +19,3 @@ Once the application is up and running the first step is to obtain a JWT. To do 
 ![Postman POST Request](./images/postman-post.png)
 
 From there you will receive a JWT token which you can use to make a `GET` request to `http://localhost:8080` 
-
-![Postman GET Request](./images/postman-get.png)
-
-## Thank You 🙏
-
-A huge thank you to [Daniel Garnier-Moiroux](https://twitter.com/kehrlann) 👏🏻 who helped me get through the biggest issue I had which was the fact that Spring Auth Server insists on producing RSA-256 signatures for its JWTs, you have to be very explicit if you want something else. This is why in the `TokenService` we are using the `MacAlgorithm.HS512` in the encoding and then using that same algorithm in the `JwtDecoder`. 
-
-```java
-var encoderParameters = JwtEncoderParameters.from(JwsHeader.with(MacAlgorithm.HS512).build(), claims);
-return this.encoder.encode(encoderParameters).getTokenValue();
-```
-
-```java
-@Bean
-public JwtDecoder jwtDecoder() {
-    byte[] bytes = jwtKey.getBytes();
-    SecretKeySpec originalKey = new SecretKeySpec(bytes, 0, bytes.length,"RSA");
-    return NimbusJwtDecoder.withSecretKey(originalKey).macAlgorithm(MacAlgorithm.HS512).build();
-}
-```
